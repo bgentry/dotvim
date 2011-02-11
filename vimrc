@@ -77,6 +77,8 @@ nmap <silent> <c-n> :NERDTreeToggle<CR>
 " Automatic fold settings for specific files. Uncomment to use.
 " autocmd FileType ruby setlocal foldmethod=syntax
 " autocmd FileType css  setlocal foldmethod=indent shiftwidth=2 tabstop=2
+autocmd Filetype html setlocal ts=2 sts=2 sw=2
+autocmd Filetype ruby setlocal ts=2 sts=2 sw=2
 
 " will save your last position in a file so next time you open it, you'll
 " come back to the same place
