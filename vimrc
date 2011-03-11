@@ -96,3 +96,16 @@ au BufReadPost * if line("'\"") > 0|if line("'\"") <= line("$")|exe("norm '\"")|
 
 "This unsets the "last search pattern" register by hitting return
 nnoremap <CR> :noh<CR><CR>
+
+" comment an entire visual block at once
+" highlight the area however you want (V, CTRL+V) then
+" ,c will comment the block
+" ,u will uncomment the block
+let b:comment_leader = '# '
+au FileType haskell,vhdl,ada            let b:comment_leader = '-- '
+au FileType vim                         let b:comment_leader = '" '
+au FileType c,cpp,java,php,js           let b:comment_leader = '// '
+au FileType sh,make,perl,ruby,python    let b:comment_leader = '# '
+au FileType tex                         let b:comment_leader = '% '
+noremap <silent> ,c :<C-B>sil <C-E>s/^/<C-R>=escape(b:comment_leader,'\/')<CR>/<CR>:noh<CR>
+noremap <silent> ,u :<C-B>sil <C-E>s/^\V<C-R>=escape(b:comment_leader,'\/')<CR>//e<CR>:noh<CR>
