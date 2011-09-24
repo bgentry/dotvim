@@ -88,8 +88,12 @@ nmap <silent> <c-n> :NERDTreeToggle<CR>
 " Automatic fold settings for specific files. Uncomment to use.
 " autocmd FileType ruby setlocal foldmethod=syntax
 " autocmd FileType css  setlocal foldmethod=indent shiftwidth=2 tabstop=2
-autocmd Filetype html setlocal ts=2 sts=2 sw=2
-autocmd Filetype ruby setlocal ts=2 sts=2 sw=2
+autocmd FileType erlang setlocal foldenable!
+
+" Per-filetype tab settings
+autocmd FileType html setlocal ts=2 sts=2 sw=2
+autocmd FileType ruby setlocal ts=2 sts=2 sw=2
+autocmd FileType erlang setlocal ts=4 sts=4 sw=4
 
 " will save your last position in a file so next time you open it, you'll
 " come back to the same place
@@ -108,6 +112,6 @@ au FileType haskell,vhdl,ada            let b:comment_leader = '-- '
 au FileType vim                         let b:comment_leader = '" '
 au FileType c,cpp,java,php,js           let b:comment_leader = '// '
 au FileType sh,make,perl,ruby,python    let b:comment_leader = '# '
-au FileType tex                         let b:comment_leader = '% '
+au FileType tex,erlang                  let b:comment_leader = '% '
 noremap <silent> ,c :<C-B>sil <C-E>s/^/<C-R>=escape(b:comment_leader,'\/')<CR>/<CR>:noh<CR>
 noremap <silent> ,u :<C-B>sil <C-E>s/^\V<C-R>=escape(b:comment_leader,'\/')<CR>//e<CR>:noh<CR>
