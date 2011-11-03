@@ -95,6 +95,9 @@ autocmd FileType erlang setlocal nofoldenable
 autocmd FileType html setlocal ts=2 sts=2 sw=2
 autocmd FileType ruby setlocal ts=2 sts=2 sw=2
 autocmd FileType erlang setlocal ts=4 sts=4 sw=4
+autocmd FileType go setlocal ts=2 sts=2 sw=4 noexpandtab listchars=tab:\ \ ,trail:.
+
+autocmd FileType go highlight SpecialKey NONE
 
 " will save your last position in a file so next time you open it, you'll
 " come back to the same place
@@ -111,7 +114,7 @@ nnoremap <CR> :noh<CR><CR>
 let b:comment_leader = '# '
 au FileType haskell,vhdl,ada            let b:comment_leader = '-- '
 au FileType vim                         let b:comment_leader = '" '
-au FileType c,cpp,java,php,js           let b:comment_leader = '// '
+au FileType c,cpp,java,php,js,go        let b:comment_leader = '// '
 au FileType sh,make,perl,ruby,python    let b:comment_leader = '# '
 au FileType tex,erlang                  let b:comment_leader = '% '
 noremap <silent> ,c :<C-B>sil <C-E>s/^/<C-R>=escape(b:comment_leader,'\/')<CR>/<CR>:noh<CR>
