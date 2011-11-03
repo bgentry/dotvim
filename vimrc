@@ -43,6 +43,12 @@ set nowritebackup                 " And again.
 set directory=~/.vim_tmp//,.  " Keep swap files in one location
 set dir=~/.vim_tmp//,.
 
+" Color Scheme.
+" Or use vividchalk
+" colorscheme vilight
+set background=light
+colorscheme solarized
+
 " UNCOMMENT TO USE
 set tabstop=2                    " Global tab width.
 set shiftwidth=2                 " And again, related.
@@ -50,16 +56,11 @@ set expandtab                    " Use spaces instead of tabs
 
 " Make tab characters visible
 set list listchars=tab:>-,trail:.
-:highlight SpecialKey ctermfg=darkgrey
+:highlight SpecialKey ctermfg=darkgrey ctermbg=black
 
 set laststatus=2                  " Show the status line all the time
 " Useful status information at bottom of screen
 set statusline=[%n]\ %<%.99f\ %h%w%m%r%y\ %{exists('*CapsLockStatusline')?CapsLockStatusline():''}%=%-16(\ %l,%c-%v\ %)%P
-
-" Or use vividchalk
-" colorscheme vilight
-set background=light
-colorscheme solarized
 
 " Tab mappings.
 map <leader>tt :tabnew<cr>
