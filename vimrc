@@ -34,7 +34,7 @@ set hlsearch                      " Highlight matches.
 set wrap                          " Turn on line wrapping.
 set scrolloff=3                   " Show 3 lines of context around the cursor.
 
-" set title                         " Set the terminal's title
+set title                         " Set the terminal's title
 
 set visualbell                    " No beeping.
 
@@ -88,7 +88,7 @@ nmap <silent> <c-n> :NERDTreeToggle<CR>
 " Automatic fold settings for specific files. Uncomment to use.
 " autocmd FileType ruby setlocal foldmethod=syntax
 " autocmd FileType css  setlocal foldmethod=indent shiftwidth=2 tabstop=2
-autocmd FileType erlang setlocal foldenable!
+autocmd FileType erlang setlocal nofoldenable
 
 " Per-filetype tab settings
 autocmd FileType html setlocal ts=2 sts=2 sw=2
