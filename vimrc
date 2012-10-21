@@ -120,3 +120,6 @@ au FileType sh,make,perl,ruby,python    let b:comment_leader = '# '
 au FileType tex,erlang                  let b:comment_leader = '% '
 noremap <silent> ,c :<C-B>sil <C-E>s/^/<C-R>=escape(b:comment_leader,'\/')<CR>/<CR>:noh<CR>
 noremap <silent> ,u :<C-B>sil <C-E>s/^\V<C-R>=escape(b:comment_leader,'\/')<CR>//e<CR>:noh<CR>
+
+" markdown Github-style syntax highlighting
+let g:markdown_github_languages = ['ruby', 'erb=eruby', 'go', 'erlang', 'bash']
