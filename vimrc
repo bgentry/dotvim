@@ -95,7 +95,8 @@ autocmd FileType erlang setlocal nofoldenable
 autocmd FileType html setlocal ts=2 sts=2 sw=2
 autocmd FileType ruby setlocal ts=2 sts=2 sw=2
 autocmd FileType erlang setlocal ts=4 sts=4 sw=4
-autocmd FileType go setlocal ts=2 sts=2 sw=4 noexpandtab listchars=tab:\ \ ,trail:.
+autocmd FileType markdown setlocal ts=4 sts=4 sw=4
+autocmd FileType go setlocal ts=2 sts=2 sw=2 noexpandtab listchars=tab:\ \ ,trail:.
 
 autocmd FileType go highlight SpecialKey NONE
 
