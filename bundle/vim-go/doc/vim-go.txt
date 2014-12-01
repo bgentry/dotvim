@@ -19,16 +19,18 @@ CONTENTS                                                          *go-contents*
 	3. Commands.....................................|go-commands|
 	4. Settings.....................................|go-settings|
 	5. Mappings.....................................|go-mappings|
-	6. Credits......................................|go-credits|
+	6. Troubleshooting..............................|go-troubleshooting|
+	7. Credits......................................|go-credits|
 
 ===============================================================================
 INTRO                                                                *go-intro*
 
-Full featured Go development environment support for Vim. vim-go installs
-automatically all necessary binaries if they are not found. It comes with
-pre-defined sensible settings (like auto gofmt on save), has autocomplete,
-snippet support, go toolchain commands, etc... Do not use it with other Go
-plugins.
+Go (golang) support for Vim. vim-go installs automatically all necessary
+binaries for providing seamless Vim integration.  It comes with pre-defined
+sensible settings (like auto gofmt on save), has autocomplete, snippet
+support, improved syntax highlighting, go toolchain commands, etc... It's
+highly customizable and each individual feature can be disabled/enabled
+easily.
 
   * Improved Syntax highlighting, such as Functions, Operators, Methods..
   * Auto completion support via `gocode`
@@ -42,10 +44,13 @@ plugins.
   * Lint your code with `golint`
   * Run your code trough `go vet` to catch static errors.
   * Advanced source analysis tool with `oracle`
+  * Precise type-safe renaming of identifiers with `gorename`
   * List all source files and dependencies
   * Checking with `errcheck` for unchecked errors.
   * Integrated and improved snippets. Supports `ultisnips` or `neosnippet`
   * Share your current code to play.golang.org
+  * Type information about the underlying identifier 
+  * Tagbar support to show tags of the source code in a sidebar with `gotags`
 
 ===============================================================================
 INSTALL                                                           *go-install*
@@ -55,17 +60,29 @@ If you use pathogen, just clone it into your bundle directory: >
 	$ cd ~/.vim/bundle
 	$ git clone https://github.com/fatih/vim-go.git
 <
-For the first Vim start it will try to download and install all necessary go
-binaries. To disable this behaviour please check out |go-settings|.
 
-Autocompletion is enabled by default via `<C-x><C-o>`, to get real-time
-completion (completion by type) install YCM: >
+For Vundle add this line to your vimrc:
+>
+  Plugin 'fatih/vim-go'
+<
+and execute `:PluginInstall` (or `:BundleInstall` for older versions of Vundle)
 
-	$ cd ~/.vim/bundle
-	$ git clone https://github.com/Valloric/YouCompleteMe.git
-	$ cd YouCompleteMe
-	$ ./install.sh
 
+Please be sure all necessary binares are installed (such as `gocode`, `godef`,
+`goimports`, etc..). You can easily install them with the included
+|GoInstallBinaries|. Those binaries will be automatically downloaded and
+installed to your `$GOBIN` environment (if not set it will use `$GOPATH/bin`).
+It requires `git` and `hg` for fetching the individual Go packages.
+
+* Autocompletion is enabled by default via `<C-x><C-o>`, to get real-time
+completion (completion by type) install:
+https://github.com/Valloric/YouCompleteMe or
+https://github.com/Shougo/neocomplete.vim
+* To get displayed source code tag informations on a sidebar install
+https://github.com/majutsushi/tagbar.
+* For snippet feature install:
+https://github.com/SirVer/ultisnips or
+https://github.com/Shougo/neosnippet.vim.
 
 ===============================================================================
 COMMANDS                                                          *go-commands*
@@ -89,16 +106,6 @@ COMMANDS                                                          *go-commands*
     current Go buffer.  If {path} is not being imported, an error will be
     displayed and the buffer will be untouched.
 
-                                                        *:GoDisableGoimports*
-:GoDisableGoimports
-
-    Disable goimports and use "fmt" for |:GoFmt| command
-
-                                                         *:GoEnableGoimports*
-:GoEnableGoimports
-
-    Enable goimports and use "goimports" for |:GoFmt| command
-
                                                                     *:GoLint*
 :GoLint
 
@@ -107,8 +114,14 @@ COMMANDS                                                          *go-commands*
                                                                      *:GoDoc*
 :GoDoc [word]
 
-    Open the relevant GoDoc for either the word[s] passed to the command or
-    the, by default, the word under the cursor.
+    Open the relevant GoDoc in split window for either the word[s] passed to
+    the command or by default, the word under the cursor.
+
+                                                              *:GoDocBrowser*
+:GoDocBrowser [word]
+
+    Open the relevant GoDoc in browser for either the word[s] passed to the
+    command or by default, the word under the cursor.
 
                                                                      *:GoFmt*
 :GoFmt
@@ -116,13 +129,21 @@ COMMANDS                                                          *go-commands*
     Filter the current Go buffer through gofmt.  It tries to preserve cursor
     position and avoids replacing the buffer with stderr output.
 
+                                                                  *:GoImports*
+:GoImports
+
+    Filter the current Go buffer through goimports (needs to be installed).
+    `goimports` automatically discards/add import path based on the code. Like
+    |GoFmt|, It tries to preserve cursor position and avoids replacing the 
+    buffer with stderr output.
+
                                                                      *:GoPlay*
 :[range]GoPlay
 
     Share snippet to play.golang.org. If no [range] is given it shares
     the whole file, otherwise the selected lines are shared. Snippet URL
-    is copied to system clipboard if Vim is compiled with |+clipboard| or
-    |+xterm_clipboard| otherwise it's get yanked into the `""` register.
+    is copied to system clipboard if Vim is compiled with 'clipboard' or
+     'xterm-clipboard' otherwise it's get yanked into the `""` register.
 
                                                                      *:GoVet*
 :GoVet
@@ -140,28 +161,47 @@ COMMANDS                                                          *go-commands*
     given, it will jump to the declaration under the cursor.
 
                                                                      *:GoRun*
-:GoRun [expand]
+:GoRun[!] [expand]
 
     Build and run your current main package. By default all main files for the
-    current file is used. An argument that is passed to |expand| can be used as
-    file selector. For example use `:Gorun %` to select the current file only.
+    current file is used. If an argument is passed, 'expand' is used as file
+    selector. For example use `:GoRun %` to select the current file only.  
+
+    If [!] is not given the first error is jumped to.
 
                                                                    *:GoBuild*
-:GoBuild
+:GoBuild[!]
 
     Build your package with `go build`. It automatically builds only the files
-    that depends on the current file
+    that depends on the current file. GoBuild doesn't produce a result file.
+    Use 'make' to create a result file. 
+
+    If [!] is not given the first error is jumped to.
+
+                                                                    *:GoInfo*
+:GoInfo
+    Show type information about the identifer under the cursor. For example
+    putting it above a function call is going to show the full function
+    signature. It uses gocode to get the type informations.
 
 
-:GoInstall                                                        *:GoInstall*
+                                                                 *:GoInstall*
+:GoInstall
 
   Install your package with `go install`.
 
                                                                     *:GoTest*
-:GoTest
+:GoTest [expand]
 
     Test your _test.go files via in your current directory. Errors are
-    populated in quickfix window.
+    populated in quickfix window.  If an argument is passed, 'expand' is used
+    as file selector (useful for cases like `:GoTest ./...`).
+
+                                                                *:GoCoverage*
+:GoCoverage
+
+    Create a coverage profile and open a browser to display the annotated
+    source code of the current package.
 
                                                                 *:GoErrCheck*
 :GoErrCheck
@@ -179,42 +219,31 @@ COMMANDS                                                          *go-commands*
 
     Show dependencies for the current package
 
+                                                          *:GoInstallBinaries*
+:GoInstallBinaries
+
+    Download and Install all necessary Go tool binaries such as `godef`,
+    `goimports`, `gocode`, etc.. under `g:go_bin_path`
+
                                                           *:GoUpdateBinaries*
 :GoUpdateBinaries
 
-    Update all Go binaries under `g:go_bin_path`
+    Download and Update previously installed Go tool binaries such as `godef`,
+    `goimports`, `gocode`, etc.. under `g:go_bin_path`. This can be used to
+    update the necessary Go binaries.
 
-                                                          *:GoOracleDescribe*
-:GoOracleDescribe
+                                                              *:GoImplements*
+:GoImplements
 
-    Describe the expression at the current point.
+    Show 'implements' relation for a selected package. A list of interfaces
+    for the type under the cursor (or selected package) is shown in a custom
+    window. Hit `<enter>` to jump in a new tab or close it via `<c-c>`.
 
-                                                           *:GoOracleCallees*
-:GoOracleCallees
+                                                                *:GoRename*
+:GoRename [to]
 
-    Show possible callees of the function call at the current point.
-
-                                                           *:GoOracleCallers*
-:GoOracleCallers
-
-    Show the set of callers of the function containing the current point.
-
-                                                         *:GoOracleCallgraph*
-:GoOracleCallgraph
-
-    Show the callgraph of the current program.
-
-                                                        *:GoOracleImplements*
-:GoOracleImplements
-
-    Describe the 'implements' relation for types in the package containing the
-    current point.
-
-                                                      *:GoOracleChannelPeers*
-:GoOracleChannelPeers
-
-    Enumerate the set of possible corresponding sends/receives for this
-    channel receive/send operation.
+    Rename the identifier under the cursor to the desired new name. If no
+    argument is given a prompt will ask for the desired identifier.
 
 ===============================================================================
 MAPPINGS                                                        *go-mappings*
@@ -238,7 +267,12 @@ Calls `go run` for the current file
 Calls `go build` for the current package
 
 
-                                                                *(go-install)*
+                                                                 *(go-info)*
+
+Shows type information for the word under the cursor
+
+
+                                                              *(go-install)*
 
 Calls `go install` for the current package
 
@@ -247,6 +281,9 @@ Calls `go install` for the current package
 
 Calls `go test` for the current package
 
+                                                             *(go-coverage)*
+
+Calls `go test -coverprofile-temp.out` for the current package
 
                                                                   *(go-vet)*
 
@@ -264,7 +301,28 @@ Show dependencies for the current package
 
                                                                   *(go-doc)*
 
-Show the relevant GoDoc for the word under the cursor.
+Show the relevant GoDoc for the word under the cursor in a split window
+leftabove (default mode).
+
+                                                            *(go-doc-split)*
+
+Show the relevant GoDoc for the word under the cursor in a split window.
+
+
+                                                         *(go-doc-vertical)*
+
+Show the relevant GoDoc for the word under the cursor in a vertical split
+window.
+
+
+                                                              *(go-doc-tab)*
+
+Show the relevant GoDoc for the word under the cursor in a tab window.
+
+
+                                                          *(go-doc-browser)*
+
+Show the relevant GoDoc for the word under in browser
 
                                                                   *(go-def)*
 
@@ -285,6 +343,14 @@ Goto declaration/definition. Results are shown in a vertical split window.
 
 Goto declaration/definition. Results are shown in a tab window.
 
+                                                          *(go-implements)*
+
+Show the interfaces that the type under the cursor implements.
+
+                                                              *(go-rename)*
+
+Rename the identifier under the cursor to the desired new name
+
 
 
 ===============================================================================
@@ -293,8 +359,9 @@ SETTINGS                                                        *go-settings*
                                                 *'g:go_play_browser_command'*
 
 Use this option to change the browser that is used to open the snippet url
-posted to play.golang.org with |:GoPlay|. By default it tries to find it
-automatically for the current OS. >
+posted to play.golang.org with |:GoPlay| or for the relevant documentation
+used with |:GoDocBrowser|. By default it tries to find it automatically for
+the current OS. >
 
   let g:play_browser_command = ''
 <
@@ -305,7 +372,14 @@ with |:GoPlay|. By default it's enabled. >
 
   let g:go_play_open_browser = 1
 <
+                                                      *'g:go_auto_type_info'*
 
+Use this option to show the type info (|:GoInfo|) for the word under the cursor
+automatically. Whenever the cursor changes the type info will be updated.
+By default it's disabled >
+
+  let g:go_auto_type_info = 0
+<
                                                         *'g:go_fmt_autosave'*
 
 Use this option to auto |:GoFmt| on save. By default it's enabled >
@@ -314,11 +388,19 @@ Use this option to auto |:GoFmt| on save. By default it's enabled >
 <
                                                          *'g:go_fmt_command'*
 
-Use this option to define which tool is used to gofmt. By default `goimports`
-is used >
+Use this option to define which tool is used to gofmt. By default `gofmt` is
+used >
 
-  let g:go_fmt_command = "goimports"
+  let g:go_fmt_command = "gofmt"
 <
+                                                         *'g:go_fmt_options'*
+
+Use this option to add additional options to the |g:go_fmt_command|. Default
+is empty. >
+
+  let g:go_fmt_options = ''
+<
+
                                                    *'g:go_fmt_fail_silently'*
 
 Use this option to disable showing a quickfix window when |g:go_fmt_command|
@@ -326,31 +408,154 @@ fails. By default it's disabled. >
 
   let g:go_fmt_fail_silently = 0
 <
+                                              *'g:go_doc_keywordprg_enabled'*
 
+Use this option to change the enable GoDoc to run on words under the cursor
+with the default K , keywordprg shortcut. This shortcut is by default set to
+use the program man. However in go using godoc is more idiomatic. Default is
+enabled. >
+
+  let g:go_doc_keywordprg_enabled = 1
+<
+                                                         *'g:go_doc_command'*
+
+Use this option to define which tool is used to godoc. By default `godoc` is
+used >
+
+  let g:go_doc_command = "godoc"
+<
+                                                         *'g:go_doc_options'*
+
+Use this option to add additional options to the |g:go_doc_command|. Default
+is empty. >
+
+  let g:go_doc_options = ''
+
+<                                                            *'g:go_bin_path'*
+
+Use this option to change default path for vim-go tools when using 
+|GoInstallBinaries| and |GoUpdateBinaries|. If not set `$GOBIN` or
+`$GOPATH/bin` is used. >
+
+  let g:go_bin_path = ""
+<
                                                       *'g:go_snippet_engine'*
 
 Use this option to define the default snippet engine.  By default "ultisnips"
-is enabled. Use "neosnippet" for neosnippet.vim: >
+is used. Use "neosnippet" for neosnippet.vim: >
 
   let g:go_snippet_engine = "ultisnips"
 <
-                                                 *'g:go_disable_autoinstall'*
 
-By default vim-go automatically install all necessary tools which are used
-for |:go-commands|. Disable it if you don't wish to be updated. This also disables
-the |:GoUpdateBinaries| command. >
+                                      *'g:go_highlight_array_whitespace_error'*
 
-  let g:go_disable_autoinstall = 0
+Highlights white space after "[]". >
+
+  let g:go_highlight_array_whitespace_error = 1
 <
-                                                            *'g:go_bin_path'*
 
-Use this option to change default path for vim-go tools. By default it's set
-to `$HOME/.vim-go/`. To change it: >
+                                      *'g:go_highlight_chan_whitespace_error'*
 
-  let g:go_bin_path = expand("$HOME/.vim-go/")
+Highlights white space around the communications operator that don't follow
+the standard style. >
+
+  let g:go_highlight_chan_whitespace_error = 1
+<
+
+                                                *'g:go_highlight_extra_types'*
+
+Highlights commonly used library types (io.Reader, etc.). >
+
+  let g:go_highlight_extra_types = 1
+<
+
+                                            *'g:go_highlight_space_tab_error'*
+
+Highlights instances of tabs following spaces. >
+
+  let g:go_highlight_space_tab_error = 1
+<
+                                  *'g:go_highlight_trailing_whitespace_error'*
+
+Highlights trailing white space. >
+
+  let g:go_highlight_trailing_whitespace_error = 1
+
+<
+                                                  *'g:go_highlight_operators'*
+
+Highlights operators such as `:=` , `==`, `-=`, etc ...By default it's
+disabled. >
+
+	let g:go_highlight_operators = 0
+<
+                                                *'g:go_highlight_functions'*
+
+Highlights function names. By default it's disabled. >
+
+	let g:go_highlight_functions = 0
+<
+                                                  *'g:go_highlight_methods'*
+
+Highlights method names. By default it's disabled. >
+
+	let g:go_highlight_methods = 0
+<
+                                                  *'g:go_highlight_structs'*
+
+Highlights struct names. By default it's disabled. >
+
+	let g:go_highlight_structs = 0
+<
+===============================================================================
+TROUBLESHOOTING                                         *go-troubleshooting*
+
+I'm using Fish shell but have some problems using Vim-go~
+
+First environment variables in Fish are applied differently, it should be like:
+>
+	set -x GOPATH /your/own/gopath
+<
+Second, Vim needs a POSIX compatible shell (more info here:
+https://github.com/dag/vim-fish#teach-a-vim-to-fish). If you use Fish to open
+vim, it will make certainx shell based commands fail (means vim-go will fail
+too). To overcome this problem change the default shell by adding the
+following into your .vimrc (on the top of the file):
+>
+	if $SHELL =~ 'fish'
+	  set shell='/bin/sh'
+	endif
+<
+or
+>
+	set shell='/bin/sh'
+>
+
+I'm seeing weirds errors during the startup~
+
+If you see errors like this:
+>
+  Error installing code.google.com/p/go.tools/cmd/goimports:
+	Error installing code.google.com/p/rog-go/exp/cmd/godef:
+<
+that means your local Go setup is broken or the remote website is down.  For
+example sometimes code.google.com times out. To test, just execute a simple go
+get:
+
+>
+	go get code.google.com/p/go.tools/cmd/goimports
+<
+You'll see a more detailed error. If this works, vim-go will work too.
 
 ===============================================================================
 CREDITS                                                         *go-credits*
+
+* Go Authors for offical vim plugins
+* Gocode, Godef, Golint, Oracle, Goimports, Errcheck projects and authors of
+  those projects.
+* Other vim-plugins, thanks for inspiration (vim-golang, go.vim, vim-gocode,
+  vim-godef)
+* vim-go contributors: https://github.com/fatih/vim-go/graphs/contributors
 
 
 vim:ft=help:et:ts=2:sw=2:sts=2:norl
