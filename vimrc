@@ -123,3 +123,6 @@ noremap <silent> ,u :<C-B>sil <C-E>s/^\V<C-R>=escape(b:comment_leader,'\/')<CR>/
 
 " markdown Github-style syntax highlighting
 let g:markdown_github_languages = ['ruby', 'erb=eruby', 'go', 'erlang', 'bash']
+
+" make vim-go default to using goimports
+let g:go_fmt_command = "goimports"
