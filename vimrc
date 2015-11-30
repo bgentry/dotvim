@@ -126,3 +126,6 @@ let g:markdown_github_languages = ['ruby', 'erb=eruby', 'go', 'erlang', 'bash']
 
 " make vim-go default to using goimports
 let g:go_fmt_command = "goimports"
+
+" ctrlp.vim
+set runtimepath^=~/.vim/bundle/ctrlp.vim
