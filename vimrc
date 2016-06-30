@@ -7,6 +7,15 @@ set nocompatible                  " Must come first because it changes other opt
 call pathogen#runtime_append_all_bundles()
 call pathogen#helptags()
 
+" Vundle plugin. Keep above file type detection
+set rtp+=~/.vim/bundle/Vundle.vim
+call vundle#begin()
+
+Plugin 'VundleVim/Vundle.vim'
+Plugin 'szw/vim-ctrlspace'
+
+call vundle#end()
+
 syntax enable                     " Turn on syntax highlighting.
 filetype plugin indent on         " Turn on file type detection.
 
@@ -129,3 +138,8 @@ let g:go_fmt_command = "goimports"
 
 " ctrlp.vim
 set runtimepath^=~/.vim/bundle/ctrlp.vim
+let g:ctrlp_user_command = ['.git/', 'git --git-dir=%s/.git ls-files -oc --exclude-standard']
+let g:ctrlp_prompt_mappings = {
+  \ 'AcceptSelection("e")': [],
+  \ 'AcceptSelection("t")': ['<cr>', '<c-m>'],
+  \ }

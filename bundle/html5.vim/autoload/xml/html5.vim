@@ -1,7 +1,7 @@
 " Vim completion for HTML5 data file
-" Language:       HTML5
-" Maintainer:     othree <othree@gmail.com>
-" Last Change:    2011 Apr 9
+" Language:	    HTML (version 5.1 Draft 2016 Jan 13)
+" Maintainer:   Kao, Wei-Ko(othree) ( othree AT gmail DOT com )
+" Last Change:  2016 Jan 20
 
 
 " Lang Tag: {{{
@@ -545,7 +545,7 @@ let g:xmldata_html5 = {
 \ ],
 \ 'iframe': [
     \ [],
-    \ extend(copy(global_attributes), {'src': [], 'name': [], 'width': [], 'height': [], 'sandbox': ['allow-same-origin', 'allow-forms', 'allow-scripts'], 'seamless': ['seamless', '']})
+    \ extend(copy(global_attributes), {'src': [], 'srcdoc': [], 'name': [], 'width': [], 'height': [], 'sandbox': ['allow-same-origin', 'allow-forms', 'allow-scripts'], 'seamless': ['seamless', '']})
 \ ],
 \ 'img': [
     \ [],
@@ -596,8 +596,12 @@ let g:xmldata_html5 = {
     \ global_attributes
 \ ],
 \ 'menu': [
-    \ flow_elements + ['li'],
+    \ flow_elements + ['menuitem'],
     \ extend(copy(global_attributes), {'type': ['toolbar', 'context'], 'label': []})
+\ ],
+\ 'menuitem': [
+    \ flow_elements + ['li'],
+    \ extend(copy(global_attributes), {'type': ['toolbar', 'context'], 'label': [], 'icon': [], 'disabled': [], 'checked': [], 'radiogroup': [], 'default': [], 'command': []})
 \ ],
 \ 'meta': [
     \ [],
@@ -659,6 +663,10 @@ let g:xmldata_html5 = {
     \ phrasing_elements,
     \ extend(copy(global_attributes), {'cite': []})
 \ ],
+\ 'rb': [
+    \ phrasing_elements,
+    \ global_attributes
+\ ],
 \ 'rp': [
     \ phrasing_elements,
     \ global_attributes
@@ -667,8 +675,12 @@ let g:xmldata_html5 = {
     \ phrasing_elements,
     \ global_attributes
 \ ],
-\ 'ruby': [
+\ 'rtc': [
     \ phrasing_elements + ['rp', 'rt'],
+    \ global_attributes
+\ ],
+\ 'ruby': [
+    \ phrasing_elements + ['rb', 'rp', 'rt', 'rtc'],
     \ global_attributes
 \ ],
 \ 'samp': [
