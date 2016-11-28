@@ -82,6 +82,11 @@ map <leader>tf :tabfirst<cr>
 map <leader>tl :tablast<cr>
 map <leader>tm :tabmove
 
+" map escape to jj, jk, kj
+imap jj <Esc>
+imap jk <Esc>
+imap kj <Esc>
+
 " NERDTree ctrl+n mapping
 nmap <silent> <c-n> :NERDTreeToggle<CR>
 
