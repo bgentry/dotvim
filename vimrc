@@ -55,7 +55,7 @@ set dir=~/.vim_tmp//,.
 " Color Scheme.
 " Or use vividchalk
 " colorscheme vilight
-set background=light
+set background=dark
 colorscheme solarized
 
 " UNCOMMENT TO USE
